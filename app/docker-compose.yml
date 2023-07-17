@@ -1,7 +1,7 @@
 version: '3.8'
 services:
-  appseed-app:
-    container_name: appseed_app
+  smartkits-app:
+    container_name: Smartkits
     restart: always
     build: .
     networks:
@@ -14,11 +14,11 @@ services:
     ports:
       - "5085:5085"
     volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - ./config/nginx:/etc/nginx/conf.d
     networks:
       - web_network
     depends_on: 
-      - appseed-app
+      - smartkits-app
 networks:
   db_network:
     driver: bridge

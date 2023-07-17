@@ -4,7 +4,7 @@ python-dotenv
 whitenoise
 django-admin-volt==1.0.10
 psycopg2
-# psycopg2-binary
+psycopg2-binary
 # mysqlclient
 
 # Tooling

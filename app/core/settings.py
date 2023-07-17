@@ -16,7 +16,10 @@ from dotenv import load_dotenv
 import django_dyn_dt
 
 
-load_dotenv()  # take environment variables from .env.
+# Construct the relative path to your .env file
+relative_env_path = os.path.join(os.getcwd(), "app", "config", "env.sample")
+
+load_dotenv(relative_env_path)  # take environment variables from .env.
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
