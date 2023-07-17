@@ -74,15 +74,16 @@
 
 @echo off
 
-"venv\Scripts\python.exe" manage.py graph_models --pydot ^
+"env\Scripts\python.exe" manage.py graph_models --pydot ^
  --all-applications ^
  --group-models ^
  --color-code-deletions ^
- --verbose-names ^
  --arrow-shape normal ^
- --rankdir BT ^
+ --rankdir LR ^
  --theme django2018 ^
- --output erd.pdf ^
+ --exclude-models LogEntry,Token,TokenProxy,AbstractBaseSession,Session,AbstractUser,Group,Permission,AbstractBaseUser,PermissionsMixin,ContentType ^
+ --output erd.png ^
  
+@REM  --verbose-names ^
 
 exit

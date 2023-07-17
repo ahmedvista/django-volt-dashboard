@@ -10,7 +10,10 @@ psycopg2
 # Tooling
 django-dynamic-datatb
 django-api-generator
+
+# model graphviz
+pydot
 django-extensions
 
-
+# icons
 fontawesomefree
