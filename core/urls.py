@@ -17,7 +17,8 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path('', include('home.urls')),
+    path("", include("apps.home.urls")),
     path("admin/", admin.site.urls),
-    path("", include('admin_volt.urls'))
+    path("", include("admin_volt.urls")),
+    path("", include("django_dyn_dt.urls")),  # <-- NEW: Dynamic_DT Routing
 ]

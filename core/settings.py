@@ -10,9 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-import os, random, string
+import os, random, string, inspect
 from pathlib import Path
 from dotenv import load_dotenv
+import django_dyn_dt
+
 
 load_dotenv()  # take environment variables from .env.
 
@@ -23,31 +25,52 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get("SECRET_KEY")
 if not SECRET_KEY:
-    SECRET_KEY = ''.join(random.choice( string.ascii_lowercase  ) for i in range( 32 ))
+    SECRET_KEY = "".join(random.choice(string.ascii_lowercase) for i in range(32))
 
 # Render Deployment Code
-DEBUG = 'RENDER' not in os.environ
+DEBUG = "RENDER" not in os.environ
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+# Add here your deployment HOSTS
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:5085",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:5085",
+]
 
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:    
+RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
 INSTALLED_APPS = [
-    'admin_volt.apps.AdminVoltConfig',
+    "admin_volt.apps.AdminVoltConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    "home",
+    # "home",
+    "apps.home",
+    "apps.product",
+    "apps.fabrication",
+    "apps.orders",
+    "apps.stock",
+    # models graph
+    "django_extensions",
+    # Tooling Dynamic_DT
+    "django_dyn_dt",  # <-- NEW: Dynamic_DT
+    # Tooling API-GEN
+    "django_api_gen",  # Django API GENERATOR  # <-- NEW
+    "rest_framework",  # Include DRF           # <-- NEW
+    "rest_framework.authtoken",  # Include DRF Auth      # <-- NEW
+    # icons
+    "fontawesomefree",
 ]
 
 MIDDLEWARE = [
@@ -63,12 +86,14 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "core.urls"
 
-HOME_TEMPLATES = os.path.join(BASE_DIR, 'home', 'templates')
+HOME_TEMPLATES = os.path.join(BASE_DIR, "templates")
+TEMPLATE_DIR_DATATB = os.path.join(BASE_DIR, "django_dyn_dt/templates")  # <-- NEW: Dynamic_DT
+
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [HOME_TEMPLATES],
+        "DIRS": [HOME_TEMPLATES, TEMPLATE_DIR_DATATB],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -87,29 +112,29 @@ WSGI_APPLICATION = "core.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DB_ENGINE   = os.getenv('DB_ENGINE'   , None)
-DB_USERNAME = os.getenv('DB_USERNAME' , None)
-DB_PASS     = os.getenv('DB_PASS'     , None)
-DB_HOST     = os.getenv('DB_HOST'     , None)
-DB_PORT     = os.getenv('DB_PORT'     , None)
-DB_NAME     = os.getenv('DB_NAME'     , None)
+DB_ENGINE = os.getenv("DB_ENGINE", None)
+DB_USERNAME = os.getenv("DB_USERNAME", None)
+DB_PASS = os.getenv("DB_PASS", None)
+DB_HOST = os.getenv("DB_HOST", None)
+DB_PORT = os.getenv("DB_PORT", None)
+DB_NAME = os.getenv("DB_NAME", None)
 
 if DB_ENGINE and DB_NAME and DB_USERNAME:
-    DATABASES = { 
-      'default': {
-        'ENGINE'  : 'django.db.backends.' + DB_ENGINE, 
-        'NAME'    : DB_NAME,
-        'USER'    : DB_USERNAME,
-        'PASSWORD': DB_PASS,
-        'HOST'    : DB_HOST,
-        'PORT'    : DB_PORT,
-        }, 
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends." + DB_ENGINE,
+            "NAME": DB_NAME,
+            "USER": DB_USERNAME,
+            "PASSWORD": DB_PASS,
+            "HOST": DB_HOST,
+            "PORT": DB_PORT,
+        },
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": "db.sqlite3",
         }
     }
 
@@ -147,10 +172,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-#if not DEBUG:
+DYN_DB_PKG_ROOT = os.path.dirname(inspect.getfile(django_dyn_dt))  # <-- NEW: Dynamic_DT
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+    os.path.join(DYN_DB_PKG_ROOT, "templates/static"),  # <-- NEW: Dynamic_DT
+)
+
+# if not DEBUG:
 #    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
@@ -158,5 +190,58 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_REDIRECT_URL = '/'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+LOGIN_REDIRECT_URL = "/"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+# ### DYNAMIC_DATATB Settings ###
+# all_models = apps.get_models()
+# for model in all_models:
+#     print(model.__name__)
+DYNAMIC_DATATB = {
+    # SLUG -> Import_PATH
+    # "home": "apps.home.models.Home",
+    ########################################
+    # product
+    ########################################
+    "product": "apps.product.models.Product",
+    "raw": "apps.product.models.Raw",
+    "rawForProduction": "apps.product.models.RawForProduction",
+    "productAttr": "apps.product.models.ProductAttr",
+    ########################################
+    # orders
+    ########################################
+    "client": "apps.orders.models.Client",
+    "supplier": "apps.orders.models.Supplier",
+    "productOrder": "apps.orders.models.ProductOrder",
+    "rawOrder": "apps.orders.models.RawOrder",
+    "budget": "apps.orders.models.Budget",
+    "damagedRaw": "apps.orders.models.DamagedRaw",
+    "damagedProduct": "apps.orders.models.DamagedProduct",
+    ########################################
+    # stock
+    ########################################
+    "productStock": "apps.stock.models.ProductStock",
+    "rawStock": "apps.stock.models.RawStock",
+}
+########################################
+
+# ### API-GENERATOR Settings ###
+API_GENERATOR = DYNAMIC_DATATB
+# API_GENERATOR = {
+#     # SLUG -> Import_PATH
+#     # "home": "apps.home.models.Home",
+#     "product": "apps.product.models.Product",
+# }
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+}
+########################################
+GRAPH_MODELS = {
+    "all_applications": True,
+    "graph_models": True,
+}

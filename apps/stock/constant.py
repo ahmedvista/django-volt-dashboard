@@ -1,0 +1,12 @@
+from django.db import models
+
+
+class STOCK_ITEM_STATUS(models.IntegerChoices):
+    IN_SUPPLY_ORDER = 0, "IN SUPPLY ORDER"
+    IN_STOCK = 1, "IN STOCK"
+    IN_FABRICATION = 2, "IN FABRICATION"
+    OUT_ORDER = 3, "OUT ORDER"
+    SOLD = 4, "SOLD"
+    RETURNED = 5, "RETURNED"
+    IN_MAINTENANCE = 6, "IN MAINTENANCE"
+    DAMAGED = 7, "DAMAGED"
