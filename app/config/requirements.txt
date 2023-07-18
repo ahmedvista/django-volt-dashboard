@@ -3,12 +3,12 @@ gunicorn
 python-dotenv
 whitenoise
 django-admin-volt==1.0.10
-psycopg2
+# psycopg2
 psycopg2-binary
 # mysqlclient
 
 # Tooling
-django-dynamic-datatb
+# django-dynamic-datatb
 django-api-generator
 
 # model graphviz

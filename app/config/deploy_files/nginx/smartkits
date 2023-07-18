@@ -1,0 +1,15 @@
+server {
+    listen 80;
+    server_name admin.smartkits-eg.com;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location  /static/ {
+        alias /var/www/smartkits_admin/staticfiles/;
+        autoindex off;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/smartkits.sock;
+    }
+}

@@ -13,12 +13,15 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os, random, string, inspect
 from pathlib import Path
 from dotenv import load_dotenv
-import django_dyn_dt
+
+# import django_dyn_dt
 
 
 # Construct the relative path to your .env file
 relative_env_path = os.path.join(os.getcwd(), "app", "config", "env.sample")
+load_dotenv(relative_env_path)  # take environment variables from .env.
 
+relative_env_path = os.path.join(os.getcwd(), "config", "env.sample")
 load_dotenv(relative_env_path)  # take environment variables from .env.
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -35,15 +38,22 @@ if not SECRET_KEY:
 # Render Deployment Code
 DEBUG = "RENDER" not in os.environ
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-# Add here your deployment HOSTS
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000",
-    "http://localhost:5085",
-    "http://127.0.0.1:8000",
-    "http://127.0.0.1:5085",
-]
 
+# Add here your deployment HOSTS
+ALLOWED_HOSTS = str(os.environ.get("ALLOWED_HOSTS")).split(",")
+CSRF_TRUSTED_ORIGINS = str(os.environ.get("CSRF_TRUSTED_ORIGINS")).split(",")
+DOMAIN = os.environ.get("DOMAIN")
+if DOMAIN:
+    ALLOWED_HOSTS.append(str(DOMAIN))
+    CSRF_TRUSTED_ORIGINS.append(f"http://{DOMAIN}")
+    CSRF_TRUSTED_ORIGINS.append(f"https://{DOMAIN}")
+HOST_IP = os.environ.get("HOST_IP")
+if HOST_IP:
+    ALLOWED_HOSTS.append(str(HOST_IP))
+    CSRF_TRUSTED_ORIGINS.append(f"http://{HOST_IP}")
+    CSRF_TRUSTED_ORIGINS.append(f"https://{HOST_IP}")
+
+print(CSRF_TRUSTED_ORIGINS)
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
@@ -67,7 +77,7 @@ INSTALLED_APPS = [
     # models graph
     "django_extensions",
     # Tooling Dynamic_DT
-    "django_dyn_dt",  # <-- NEW: Dynamic_DT
+    # "django_dyn_dt",  # <-- NEW: Dynamic_DT
     # Tooling API-GEN
     "django_api_gen",  # Django API GENERATOR  # <-- NEW
     "rest_framework",  # Include DRF           # <-- NEW
@@ -89,14 +99,20 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "core.urls"
 
+
+TEMPLATES_DIRS = []
+
 HOME_TEMPLATES = os.path.join(BASE_DIR, "templates")
-TEMPLATE_DIR_DATATB = os.path.join(BASE_DIR, "django_dyn_dt/templates")  # <-- NEW: Dynamic_DT
+# TEMPLATE_DIR_DATATB = os.path.join(BASE_DIR, "django_dyn_dt/templates")  # <-- NEW: Dynamic_DT
+
+TEMPLATES_DIRS.append(HOME_TEMPLATES)
+# TEMPLATES_DIRS.append(TEMPLATE_DIR_DATATB)
 
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [HOME_TEMPLATES, TEMPLATE_DIR_DATATB],
+        "DIRS": TEMPLATES_DIRS,
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -176,13 +192,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles/")
 
-DYN_DB_PKG_ROOT = os.path.dirname(inspect.getfile(django_dyn_dt))  # <-- NEW: Dynamic_DT
+# DYN_DB_PKG_ROOT = os.path.dirname(inspect.getfile(django_dyn_dt))  # <-- NEW: Dynamic_DT
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
-    os.path.join(DYN_DB_PKG_ROOT, "templates/static"),  # <-- NEW: Dynamic_DT
+    # os.path.join(DYN_DB_PKG_ROOT, "templates/static"),  # <-- NEW: Dynamic_DT
 )
 
 # if not DEBUG:

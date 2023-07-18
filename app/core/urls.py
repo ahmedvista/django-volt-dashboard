@@ -20,5 +20,5 @@ urlpatterns = [
     path("", include("apps.home.urls")),
     path("admin/", admin.site.urls),
     path("", include("admin_volt.urls")),
-    path("", include("django_dyn_dt.urls")),  # <-- NEW: Dynamic_DT Routing
+    # path("", include("django_dyn_dt.urls")),  # <-- NEW: Dynamic_DT Routing
 ]

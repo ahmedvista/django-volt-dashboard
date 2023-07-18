@@ -1,0 +1,17 @@
+[Unit]
+Description=gunicorn daemon
+Requires=smartkits.socket
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/var/www/smartkits_admin
+ExecStart=/var/www/smartkits_admin/env/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/smartkits.sock \
+          core.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
