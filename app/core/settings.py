@@ -16,12 +16,14 @@ from dotenv import load_dotenv
 
 # import django_dyn_dt
 
+current_file_path = os.path.abspath(__file__)
+upper_folder_dir = os.path.dirname(os.path.abspath(os.path.join(current_file_path, os.pardir)))
 
 # Construct the relative path to your .env file
-relative_env_path = os.path.join(os.getcwd(), "app", "config", "env.sample")
+relative_env_path = os.path.join(upper_folder_dir, "config", "env.sample")
 load_dotenv(relative_env_path)  # take environment variables from .env.
 
-relative_env_path = os.path.join(os.getcwd(), "config", "env.sample")
+relative_env_path = os.path.join(upper_folder_dir, "app", "config", "env.sample")
 load_dotenv(relative_env_path)  # take environment variables from .env.
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -53,7 +55,6 @@ if HOST_IP:
     CSRF_TRUSTED_ORIGINS.append(f"http://{HOST_IP}")
     CSRF_TRUSTED_ORIGINS.append(f"https://{HOST_IP}")
 
-print(CSRF_TRUSTED_ORIGINS)
 RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)

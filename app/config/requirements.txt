@@ -17,3 +17,4 @@ django-extensions
 
 # icons
 fontawesomefree
+# paramiko
